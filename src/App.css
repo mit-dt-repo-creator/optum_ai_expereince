@@ -1,0 +1,1441 @@
+/* ------------------------------------------------------------------
+   Brand typeface
+   Once licensed Optum Sans files are in public/brand/fonts/, uncomment
+   this block (match the file names). Left commented so a missing file
+   never triggers a failed request.
+   ------------------------------------------------------------------ */
+/*
+@font-face {
+  font-family: 'Optum Sans';
+  src: url('/brand/fonts/OptumSans-Regular.woff2') format('woff2');
+  font-weight: 400;
+  font-display: swap;
+}
+@font-face {
+  font-family: 'Optum Sans';
+  src: url('/brand/fonts/OptumSans-Medium.woff2') format('woff2');
+  font-weight: 500;
+  font-display: swap;
+}
+@font-face {
+  font-family: 'Optum Sans';
+  src: url('/brand/fonts/OptumSans-SemiBold.woff2') format('woff2');
+  font-weight: 600;
+  font-display: swap;
+}
+@font-face {
+  font-family: 'Optum Sans';
+  src: url('/brand/fonts/OptumSans-Bold.woff2') format('woff2');
+  font-weight: 700;
+  font-display: swap;
+}
+*/
+
+/* ------------------------------------------------------------------
+   Brand tokens
+   PLACEHOLDERS: these values approximate the Optum palette and are
+   pending confirmation against approved brand guidelines. Replace them
+   here only; the rest of the stylesheet uses the variables.
+   ------------------------------------------------------------------ */
+:root {
+  --color-bg: #faf8f2;            /* warm white page background (placeholder) */
+  --color-bg-glow: #ffe4d4;       /* soft peach glow behind the nav (placeholder) */
+  --color-surface: #ffffff;       /* experience card */
+  --color-text: #232323;          /* deep charcoal text (placeholder) */
+  --color-text-muted: #5c5955;    /* secondary text, ~6.5:1 on white */
+  --color-nav-idle: #6e6a65;      /* inactive nav labels, ~5:1 on page bg */
+  --color-orange: #ff612b;        /* Optum orange accent, decorative use (placeholder) */
+  --color-orange-strong: #c4400c; /* orange behind white text, ~5:1 (placeholder) */
+  --color-orange-tint: #ffe6d9;   /* active nav pill fill (placeholder) */
+  --color-charcoal: #262422;      /* persona card (placeholder) */
+  --color-charcoal-raised: #33302d;
+  --color-on-dark: #ffffff;
+  --color-on-dark-muted: #bdb8b1; /* ~8:1 on charcoal */
+  --color-border: #ebe4d8;
+  --color-focus: #1a5fb4;         /* focus ring, distinct from brand orange */
+
+  /* Hero gradient stops (placeholder brand-adjacent warm tones). */
+  --hero-a: #ffd6c2;
+  --hero-b: #ff8a5b;
+  --hero-c: #ff612b;
+  --hero-d: #f7b9a6;
+
+  --radius-card: 30px;
+  --radius-inset: 22px;
+  --radius-pill: 999px;
+  --shadow-card: 0 1px 2px rgba(35, 35, 35, 0.05), 0 18px 44px rgba(35, 35, 35, 0.08);
+
+  --nav-width: 300px;
+  --gutter: 40px;
+  --card-height: 680px;
+  --inset-height: 330px;
+
+  /* "Optum Sans" is used whenever available; DM Sans is a placeholder. */
+  --font-sans: 'Optum Sans', 'DM Sans', 'Segoe UI', system-ui, -apple-system, Arial, sans-serif;
+  --font-mono: 'DM Mono', ui-monospace, 'Cascadia Mono', Consolas, monospace;
+  --font-hand: 'Caveat', 'Segoe Print', 'Bradley Hand', cursive;
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  margin: 0;
+}
+
+body {
+  min-height: 100vh;
+  background: var(--color-bg);
+  color: var(--color-text);
+  font-family: var(--font-sans);
+  font-size: 16px;
+  line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
+  overflow-x: hidden;
+}
+
+/* Soft peach glow, fixed to the viewport so it never cuts off mid-page. */
+body::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  background:
+    radial-gradient(60% 70% at 0% 100%, var(--color-bg-glow), transparent 70%),
+    radial-gradient(40% 40% at 100% 0%, #fff0e6, transparent 70%);
+}
+
+h1,
+h2,
+p,
+dl,
+dd {
+  margin: 0;
+}
+
+:focus-visible {
+  outline: 3px solid var(--color-focus);
+  outline-offset: 3px;
+}
+
+/* ---------- Header ---------- */
+.app-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 22px var(--gutter) 0;
+  max-width: 1640px;
+  margin: 0 auto;
+}
+
+.logo-img {
+  height: 32px;
+  width: auto;
+  display: block;
+}
+
+.logo-text {
+  font-size: 1.6rem;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  color: var(--color-orange-strong);
+}
+
+.logo-text-suffix {
+  color: var(--color-text);
+  font-weight: 600;
+}
+
+.badge {
+  font-size: 0.8rem;
+  font-weight: 500;
+  color: var(--color-text-muted);
+  padding: 6px 14px;
+  border-radius: var(--radius-pill);
+  border: 1px solid var(--color-border);
+  background: rgba(255, 255, 255, 0.7);
+  white-space: nowrap;
+}
+
+/* ---------- Shell ---------- */
+.app-shell {
+  display: grid;
+  grid-template-columns: var(--nav-width) minmax(0, 1fr);
+  gap: var(--gutter);
+  padding: 12px var(--gutter) var(--gutter);
+  max-width: 1640px;
+  margin: 0 auto;
+}
+
+/* ---------- Left navigation ---------- */
+.side-nav {
+  padding-top: 110px;
+}
+
+.side-nav-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  position: sticky;
+  top: 40px;
+}
+
+.nav-pill {
+  width: 100%;
+  min-height: 72px;
+  padding: 12px 38px;
+  border: 0;
+  border-radius: var(--radius-pill);
+  background: transparent;
+  color: var(--color-nav-idle);
+  font: inherit;
+  font-size: 1.6rem;
+  font-weight: 500;
+  letter-spacing: -0.01em;
+  text-align: left;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: background-color 0.15s, color 0.15s;
+}
+
+.nav-pill:hover {
+  color: var(--color-text);
+  background: rgba(255, 255, 255, 0.55);
+}
+
+.nav-pill.is-active {
+  color: var(--color-text);
+  background: var(--color-orange-tint);
+  box-shadow: inset 0 0 0 1.5px rgba(255, 97, 43, 0.45);
+}
+
+/* ---------- Main ---------- */
+.app-main {
+  --picker-width: 170px;
+  min-width: 0;
+}
+
+.page-title {
+  font-size: 1.45rem;
+  font-weight: 500;
+  letter-spacing: -0.01em;
+  line-height: 1.25;
+  text-align: center;
+  margin: 0 0 16px;
+  /* Centre over the two cards, not over the selector column. */
+  padding-right: var(--picker-width, 0px);
+}
+
+.stage {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) var(--picker-width);
+  gap: 22px;
+  align-items: stretch;
+}
+
+.persona-area {
+  display: contents;
+}
+
+/* ---------- Experience card ---------- */
+.experience-card {
+  display: flex;
+  flex-direction: column;
+  min-height: var(--card-height);
+  padding: 14px;
+  background: var(--color-surface);
+  border-radius: var(--radius-card);
+  box-shadow: var(--shadow-card);
+}
+
+.experience-hero {
+  position: relative;
+  flex: 0 0 var(--inset-height);
+  display: flex;
+  align-items: flex-end;
+  padding: 0 0 34px 34px;
+  border-radius: var(--radius-inset);
+  color: #fff;
+  overflow: hidden;
+  background:
+    radial-gradient(60% 70% at 15% 15%, var(--hero-a), transparent 70%),
+    radial-gradient(55% 75% at 70% 75%, var(--hero-c), transparent 72%),
+    radial-gradient(50% 60% at 95% 20%, var(--hero-d), transparent 70%),
+    linear-gradient(135deg, var(--hero-a) 0%, var(--hero-b) 55%, var(--hero-d) 100%);
+}
+
+.hero-provider {
+  background:
+    radial-gradient(60% 70% at 85% 15%, var(--hero-a), transparent 70%),
+    radial-gradient(55% 75% at 30% 80%, var(--hero-c), transparent 72%),
+    radial-gradient(50% 60% at 5% 20%, var(--hero-d), transparent 70%),
+    linear-gradient(225deg, var(--hero-a) 0%, var(--hero-b) 55%, var(--hero-d) 100%);
+}
+
+.hero-lifeSciences {
+  background:
+    radial-gradient(60% 70% at 50% 0%, var(--hero-a), transparent 70%),
+    radial-gradient(60% 70% at 90% 90%, var(--hero-c), transparent 72%),
+    radial-gradient(50% 60% at 0% 90%, var(--hero-d), transparent 70%),
+    linear-gradient(160deg, var(--hero-a) 0%, var(--hero-d) 50%, var(--hero-b) 100%);
+}
+
+.hero-icon {
+  filter: drop-shadow(0 4px 12px rgba(150, 50, 10, 0.25));
+}
+
+.experience-body {
+  flex: 1 1 auto;
+  display: flex;
+  flex-direction: column;
+  padding: 34px 20px 18px;
+}
+
+.experience-title {
+  font-size: 1.85rem;
+  font-weight: 500;
+  letter-spacing: -0.02em;
+  line-height: 1.2;
+  margin-bottom: 18px;
+}
+
+.experience-desc {
+  color: var(--color-text-muted);
+  font-size: 1.15rem;
+  line-height: 1.6;
+  max-width: 34ch;
+}
+
+.experience-footer {
+  margin-top: auto;
+  padding-top: 28px;
+}
+
+.experience-actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-start;
+  gap: 12px;
+}
+
+.experience-hint {
+  margin-top: 12px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.85rem;
+  color: var(--color-text-muted);
+}
+
+/* ---------- Agent actions ---------- */
+.action-wrap {
+  display: inline-flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  max-width: 100%;
+}
+
+.action-wrap:first-child {
+  align-items: flex-start;
+}
+
+/* Both actions are icon + label pills. The call button shows its label by
+   default; the chat button is a 60px circle whose label slides open on hover
+   or keyboard focus, while the call button folds down to its icon. */
+.action-primary,
+.action-round {
+  --action-ease: cubic-bezier(0.22, 0.8, 0.24, 1);
+  display: inline-flex;
+  align-items: center;
+  height: 60px;
+  border: 0;
+  border-radius: var(--radius-pill);
+  color: #fff;
+  font: inherit;
+  font-weight: 500;
+  font-size: 1.1rem;
+  letter-spacing: -0.01em;
+  text-decoration: none;
+  white-space: nowrap;
+  cursor: pointer;
+  transition:
+    background-color 0.15s,
+    transform 0.15s,
+    box-shadow 0.15s,
+    padding 0.36s var(--action-ease),
+    gap 0.36s var(--action-ease);
+}
+
+.action-icon {
+  flex: 0 0 auto;
+}
+
+.action-label {
+  display: inline-block;
+  overflow: hidden;
+  max-width: 20em; /* room for edited labels */
+  transition:
+    max-width 0.36s var(--action-ease),
+    opacity 0.24s ease;
+}
+
+.action-primary {
+  gap: 12px;
+  padding: 0 28px 0 20px;
+  background: var(--color-orange-strong);
+}
+
+.action-round {
+  gap: 0;
+  padding: 0 19px; /* (60px - 22px icon) / 2 → a perfect circle */
+  background: var(--color-charcoal);
+}
+
+.action-round .action-label {
+  max-width: 0;
+  opacity: 0;
+}
+
+/* Chat hovered or focused: chat opens… */
+a.action-round:hover,
+a.action-round:focus-visible {
+  gap: 10px;
+  padding: 0 26px 0 19px;
+}
+
+a.action-round:hover .action-label,
+a.action-round:focus-visible .action-label {
+  max-width: 20em; /* room for edited labels */
+  opacity: 1;
+}
+
+/* …and the call button folds to its icon. */
+.experience-actions:has(a.action-round:hover, a.action-round:focus-visible) a.action-primary {
+  gap: 0;
+  padding: 0 20px; /* (60px - 20px icon) / 2 → a circle */
+}
+
+.experience-actions:has(a.action-round:hover, a.action-round:focus-visible)
+  a.action-primary
+  .action-label {
+  max-width: 0;
+  opacity: 0;
+}
+
+a.action-primary:hover {
+  background: #a83508;
+  box-shadow: 0 8px 20px rgba(196, 64, 12, 0.28);
+}
+
+a.action-round:hover {
+  background: #000;
+}
+
+a.action-primary:active,
+a.action-round:active {
+  transform: translateY(1px);
+}
+
+.action-primary.is-disabled,
+.action-round.is-disabled {
+  cursor: not-allowed;
+  background: #ecebe8;
+  color: #6b6b6b;
+  box-shadow: inset 0 0 0 1px #d6d4cf;
+}
+
+.action-note {
+  font-size: 0.8rem;
+  color: var(--color-text-muted);
+  line-height: 1.3;
+  max-width: 20ch;
+  text-align: center;
+}
+
+.action-wrap:first-child .action-note {
+  max-width: 26ch;
+  text-align: left;
+}
+
+/* ---------- Persona card ---------- */
+.persona-card {
+  display: flex;
+  flex-direction: column;
+  min-height: var(--card-height);
+  padding: 14px;
+  background: var(--color-charcoal);
+  color: var(--color-on-dark);
+  border-radius: var(--radius-card);
+  box-shadow: var(--shadow-card);
+}
+
+.persona-portrait {
+  position: relative;
+  flex: 0 0 var(--inset-height);
+  border-radius: var(--radius-inset);
+  overflow: hidden;
+  display: grid;
+  place-items: center;
+}
+
+.portrait-tone-0 {
+  background:
+    radial-gradient(70% 80% at 60% 30%, rgba(255, 138, 91, 0.55), transparent 70%),
+    linear-gradient(180deg, #5a4a42 0%, #2e2926 100%);
+}
+
+.portrait-tone-1 {
+  background:
+    radial-gradient(70% 80% at 60% 30%, rgba(242, 183, 125, 0.5), transparent 70%),
+    linear-gradient(180deg, #55493d 0%, #2d2925 100%);
+}
+
+.portrait-tone-2 {
+  background:
+    radial-gradient(70% 80% at 60% 30%, rgba(231, 165, 148, 0.5), transparent 70%),
+    linear-gradient(180deg, #57474a 0%, #2e2828 100%);
+}
+
+/* Bottom fade so the name stays legible over the portrait. */
+.persona-portrait::after {
+  content: '';
+  position: absolute;
+  inset: 45% 0 0;
+  background: linear-gradient(180deg, transparent, rgba(20, 18, 17, 0.75));
+  pointer-events: none;
+}
+
+.persona-portrait .avatar-lg {
+  margin-bottom: 40px;
+}
+
+.persona-identity {
+  position: absolute;
+  z-index: 1;
+  left: 24px;
+  right: 24px;
+  bottom: 22px;
+}
+
+.persona-name {
+  font-size: 1.85rem;
+  font-weight: 600;
+  letter-spacing: -0.02em;
+  line-height: 1.15;
+  overflow-wrap: anywhere;
+}
+
+.persona-id {
+  margin-top: 4px;
+  font-size: 1.05rem;
+  color: rgba(255, 255, 255, 0.85);
+}
+
+.persona-body {
+  flex: 1 1 auto;
+  padding: 26px 22px 12px;
+}
+
+.mono-label {
+  font-family: var(--font-mono);
+  font-size: 0.82rem;
+  font-weight: 400;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--color-on-dark-muted);
+}
+
+.persona-about {
+  margin-top: 8px;
+  font-size: 1.1rem;
+  line-height: 1.45;
+}
+
+.persona-details {
+  margin-top: 24px;
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 22px 28px;
+}
+
+.detail dt {
+  margin-bottom: 6px;
+}
+
+.detail dd {
+  font-size: 1.1rem;
+  line-height: 1.35;
+  overflow-wrap: anywhere;
+}
+
+/* ---------- Avatars ---------- */
+.avatar {
+  display: inline-grid;
+  place-items: center;
+  border-radius: 50%;
+  font-weight: 600;
+  color: var(--color-charcoal);
+  user-select: none;
+}
+
+.avatar-sm {
+  width: 44px;
+  height: 44px;
+  font-size: 0.95rem;
+}
+
+.avatar-lg {
+  width: 170px;
+  height: 170px;
+  font-size: 3.4rem;
+  letter-spacing: 0.02em;
+  box-shadow: 0 0 0 10px rgba(255, 255, 255, 0.06), 0 20px 44px rgba(0, 0, 0, 0.35);
+}
+
+.avatar-tone-0 {
+  background: linear-gradient(145deg, #ffd9c5, #ff9a6c);
+}
+
+.avatar-tone-1 {
+  background: linear-gradient(145deg, #fbe6c9, #f2b77d);
+}
+
+.avatar-tone-2 {
+  background: linear-gradient(145deg, #f6dcd4, #e7a594);
+}
+
+/* ---------- Persona selector ---------- */
+.persona-picker {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.persona-selector {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.persona-chip {
+  padding: 3px;
+  border: 0;
+  border-radius: 50%;
+  background: transparent;
+  box-shadow: 0 0 0 2px rgba(35, 35, 35, 0.12);
+  cursor: pointer;
+  line-height: 0;
+  opacity: 0.85;
+  transition: box-shadow 0.15s, opacity 0.15s, transform 0.15s;
+}
+
+.persona-chip:hover {
+  opacity: 1;
+  transform: scale(1.05);
+}
+
+.persona-chip.is-selected {
+  opacity: 1;
+  background: var(--color-surface);
+  box-shadow: 0 0 0 2.5px var(--color-orange), 0 6px 16px rgba(35, 35, 35, 0.15);
+}
+
+.pick-hint {
+  position: absolute;
+  bottom: calc(50% + 70px);
+  left: 62px;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  color: var(--color-text);
+  font-family: var(--font-hand);
+  font-size: 1.55rem;
+  line-height: 1;
+  transform: rotate(-8deg);
+  width: 110px;
+}
+
+.pick-hint svg {
+  margin: 6px 0 0 -6px;
+  color: var(--color-orange-strong);
+}
+
+.disclaimer {
+  margin-top: 22px;
+  padding-right: var(--picker-width, 0px);
+  text-align: center;
+  font-size: 0.8rem;
+  color: var(--color-text-muted);
+}
+
+/* ---------- Smaller desktop ---------- */
+@media (max-width: 1399px) {
+  :root {
+    --nav-width: 230px;
+    --gutter: 32px;
+    --card-height: 640px;
+    --inset-height: 300px;
+  }
+
+  .nav-pill {
+    font-size: 1.35rem;
+    min-height: 62px;
+    padding: 10px 28px;
+  }
+
+  .app-main {
+    --picker-width: 64px;
+  }
+
+  .pick-hint {
+    display: none;
+  }
+}
+
+/* ---------- Tablet ---------- */
+@media (max-width: 1099px) {
+  :root {
+    --nav-width: 176px;
+    --gutter: 24px;
+    --card-height: 600px;
+    --inset-height: 260px;
+  }
+
+  .side-nav {
+    padding-top: 60px;
+  }
+
+  .nav-pill {
+    font-size: 1.1rem;
+    min-height: 52px;
+    padding: 8px 20px;
+  }
+
+  .experience-body,
+  .persona-body {
+    padding-left: 12px;
+    padding-right: 12px;
+  }
+
+  .avatar-lg {
+    width: 140px;
+    height: 140px;
+    font-size: 2.8rem;
+  }
+}
+
+@media (max-width: 959px) {
+  .stage {
+    grid-template-columns: minmax(0, 1fr) var(--picker-width);
+  }
+
+  .experience-card {
+    grid-column: 1 / -1;
+  }
+
+  .page-title,
+  .disclaimer {
+    padding-right: 0;
+  }
+
+  :root {
+    --card-height: 0px;
+  }
+
+  .persona-selector {
+    margin-top: 0;
+  }
+}
+
+/* ---------- Phone ---------- */
+@media (max-width: 767px) {
+  :root {
+    --gutter: 16px;
+    --inset-height: 200px;
+  }
+
+  .app-header {
+    padding: 14px 16px 0;
+  }
+
+  .logo-text {
+    font-size: 1.35rem;
+  }
+
+  .app-shell {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 18px;
+    padding: 12px 16px 24px;
+  }
+
+  .side-nav {
+    padding-top: 0;
+    margin: 0 -16px;
+  }
+
+  .side-nav-list {
+    position: static;
+    flex-direction: row;
+    gap: 8px;
+    overflow-x: auto;
+    padding: 4px 16px;
+    scrollbar-width: none;
+  }
+
+  .side-nav-list::-webkit-scrollbar {
+    display: none;
+  }
+
+  .side-nav-list li {
+    flex: 0 0 auto;
+  }
+
+  .nav-pill {
+    width: auto;
+    min-height: 44px;
+    padding: 8px 18px;
+    font-size: 1rem;
+    background: rgba(255, 255, 255, 0.7);
+    box-shadow: inset 0 0 0 1px var(--color-border);
+  }
+
+  .page-title {
+    font-size: 1.25rem;
+    text-align: left;
+  }
+
+  .stage {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 16px;
+  }
+
+  .experience-hero {
+    padding: 0 0 22px 22px;
+  }
+
+  .hero-icon {
+    width: 56px;
+    height: 56px;
+  }
+
+  .experience-body {
+    padding: 24px 8px 8px;
+  }
+
+  .experience-title {
+    font-size: 1.6rem;
+    margin-bottom: 10px;
+  }
+
+  .experience-desc {
+    font-size: 1.05rem;
+  }
+
+  .persona-picker {
+    order: 1;
+    justify-content: center;
+  }
+
+  .persona-card {
+    order: 2;
+  }
+
+  .persona-selector {
+    flex-direction: row;
+  }
+
+  .persona-portrait {
+    flex-basis: 260px;
+  }
+
+  .avatar-lg {
+    width: 116px;
+    height: 116px;
+    font-size: 2.3rem;
+  }
+
+  .persona-body {
+    padding: 20px 8px 8px;
+  }
+
+  .persona-name {
+    font-size: 1.5rem;
+  }
+
+  .persona-details {
+    gap: 16px 18px;
+  }
+
+  .disclaimer {
+    text-align: left;
+  }
+}
+
+/* ---------- Persona photos (when licensed portraits are supplied) ---------- */
+.persona-photo {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center 28%;
+}
+
+.avatar-photo {
+  display: block;
+  object-fit: cover;
+}
+
+.persona-portrait .avatar-lg {
+  position: relative;
+}
+
+/* ------------------------------------------------------------------
+   Motion
+   All of it is switched off for viewers who prefer reduced motion.
+   ------------------------------------------------------------------ */
+:root {
+  --ease-out: cubic-bezier(0.22, 0.8, 0.24, 1);
+}
+
+/* Entrance: content rises in, one piece after another. */
+@keyframes rise-in {
+  from {
+    opacity: 0;
+    transform: translateY(18px);
+  }
+}
+
+@keyframes fade-in {
+  from {
+    opacity: 0;
+  }
+}
+
+.app-header {
+  animation: fade-in 500ms ease-out both;
+}
+
+.side-nav-list li {
+  animation: rise-in 600ms var(--ease-out) both;
+}
+
+.side-nav-list li:nth-child(1) { animation-delay: 60ms; }
+.side-nav-list li:nth-child(2) { animation-delay: 120ms; }
+.side-nav-list li:nth-child(3) { animation-delay: 180ms; }
+
+.page-title {
+  animation: rise-in 650ms var(--ease-out) 80ms both;
+}
+
+.experience-card {
+  animation: rise-in 750ms var(--ease-out) 160ms both;
+}
+
+.persona-card {
+  animation: rise-in 750ms var(--ease-out) 260ms both;
+}
+
+.persona-picker {
+  animation: rise-in 700ms var(--ease-out) 380ms both;
+}
+
+.disclaimer {
+  animation: fade-in 600ms ease-out 600ms both;
+}
+
+/* Hero: the gradient drifts very slowly so the page never looks static. */
+.experience-hero {
+  isolation: isolate;
+}
+
+.experience-hero::before {
+  content: '';
+  position: absolute;
+  inset: -30%;
+  z-index: -1;
+  background: inherit;
+  animation: hero-drift 22s ease-in-out infinite alternate;
+  will-change: transform;
+}
+
+.hero-icon {
+  position: relative;
+}
+
+@keyframes hero-drift {
+  from {
+    transform: translate3d(-5%, -4%, 0) rotate(0deg) scale(1);
+  }
+  to {
+    transform: translate3d(5%, 4%, 0) rotate(12deg) scale(1.08);
+  }
+}
+
+/* Portrait: a warm glow breathes behind the initials avatar. */
+.persona-portrait::before {
+  content: '';
+  position: absolute;
+  inset: -20%;
+  background: radial-gradient(40% 45% at 55% 40%, rgba(255, 120, 70, 0.35), transparent 70%);
+  animation: glow-drift 14s ease-in-out infinite alternate;
+  pointer-events: none;
+}
+
+.persona-portrait.has-photo::before {
+  display: none;
+}
+
+@keyframes glow-drift {
+  from {
+    transform: translate3d(-6%, 2%, 0) scale(0.95);
+    opacity: 0.7;
+  }
+  to {
+    transform: translate3d(6%, -3%, 0) scale(1.1);
+    opacity: 1;
+  }
+}
+
+/* Gentle lift on the call-to-action. */
+a.action-primary:hover,
+a.action-round:hover {
+  transform: translateY(-2px);
+}
+
+/* Switching category or persona: a cross-fade with a slight slide, using
+   the View Transitions API (Chrome, Edge, Safari 18+). Browsers without it
+   simply switch instantly. App.jsx sets data-vt to say which kind it is. */
+.nav-pill.is-active {
+  view-transition-name: nav-active;
+}
+
+.experience-hero {
+  view-transition-name: exp-hero;
+}
+
+.experience-body {
+  view-transition-name: exp-body;
+}
+
+.persona-portrait {
+  view-transition-name: persona-portrait;
+}
+
+.persona-body {
+  view-transition-name: persona-body;
+}
+
+::view-transition-group(*) {
+  animation-duration: 380ms;
+  animation-timing-function: var(--ease-out);
+}
+
+::view-transition-old(root),
+::view-transition-new(root) {
+  animation-duration: 220ms;
+}
+
+::view-transition-group(exp-hero) {
+  animation-duration: 450ms;
+}
+
+@keyframes vt-out {
+  to {
+    opacity: 0;
+    transform: translateY(-6px);
+  }
+}
+
+@keyframes vt-in {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+}
+
+/* data-vt: 'category' (nav), 'persona' (picker), 'card' (call cues open/close). */
+:root:is([data-vt='category'], [data-vt='card'])::view-transition-old(exp-body),
+:root:is([data-vt='category'], [data-vt='persona'])::view-transition-old(persona-body),
+:root:is([data-vt='category'], [data-vt='persona'])::view-transition-old(persona-portrait) {
+  animation: vt-out 160ms ease-in both;
+}
+
+:root:is([data-vt='category'], [data-vt='card'])::view-transition-new(exp-body),
+:root:is([data-vt='category'], [data-vt='persona'])::view-transition-new(persona-body),
+:root:is([data-vt='category'], [data-vt='persona'])::view-transition-new(persona-portrait) {
+  animation: vt-in 380ms var(--ease-out) 70ms both;
+}
+
+/* Let the detail text settle just after the portrait. */
+:root:is([data-vt='category'], [data-vt='persona'])::view-transition-new(persona-body) {
+  animation-delay: 120ms;
+}
+
+/* ---------- Call cues (after "Call AI Agent") ---------- */
+.call-view {
+  view-transition-name: exp-body;
+  flex: 1 1 auto;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 44px 26px 20px;
+}
+
+.call-orb {
+  position: relative;
+  width: 210px;
+  height: 210px;
+  flex: 0 0 auto;
+  border-radius: 50%;
+  overflow: hidden;
+  isolation: isolate;
+  background: var(--hero-b);
+  box-shadow: 0 24px 60px rgba(196, 64, 12, 0.22);
+  animation: orb-breathe 4.8s ease-in-out infinite;
+}
+
+/* Swirling warm gradient inside the orb. */
+.call-orb::before {
+  content: '';
+  position: absolute;
+  inset: -35%;
+  z-index: -1;
+  background:
+    radial-gradient(45% 45% at 30% 30%, var(--hero-a), transparent 70%),
+    radial-gradient(50% 50% at 75% 70%, var(--hero-c), transparent 70%),
+    radial-gradient(40% 40% at 80% 20%, var(--hero-d), transparent 70%),
+    linear-gradient(135deg, var(--hero-a), var(--hero-b) 55%, var(--hero-d));
+  filter: blur(14px);
+  animation: orb-swirl 14s linear infinite;
+}
+
+.call-orb-sheen {
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  background: radial-gradient(60% 50% at 35% 25%, rgba(255, 255, 255, 0.55), transparent 60%);
+}
+
+@keyframes orb-swirl {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@keyframes orb-breathe {
+  0%,
+  100% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.035);
+  }
+}
+
+.call-title {
+  margin-top: 34px;
+  font-size: 1.55rem;
+  font-weight: 500;
+  letter-spacing: -0.015em;
+  text-align: center;
+  outline: none;
+}
+
+.call-status {
+  margin-top: 6px;
+  font-size: 0.85rem;
+  color: var(--color-text-muted);
+  text-align: center;
+}
+
+.call-prompts {
+  align-self: stretch;
+  margin-top: 30px;
+}
+
+.call-prompts-label {
+  color: var(--color-text-muted);
+  margin-bottom: 10px;
+}
+
+.call-prompts ul {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: 10px;
+}
+
+.call-prompts li {
+  font-size: 1.02rem;
+  line-height: 1.45;
+  color: var(--color-text);
+  animation: rise-in 500ms var(--ease-out) both;
+}
+
+.call-prompts li:nth-child(1) { animation-delay: 200ms; }
+.call-prompts li:nth-child(2) { animation-delay: 300ms; }
+.call-prompts li:nth-child(3) { animation-delay: 400ms; }
+
+.call-footer {
+  margin-top: auto;
+  padding-top: 24px;
+}
+
+/* Dark pill: elapsed time + close. */
+.call-bar {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px;
+  border-radius: var(--radius-pill);
+  background: var(--color-charcoal);
+  color: #fff;
+  box-shadow: 0 10px 24px rgba(35, 35, 35, 0.18);
+  animation: rise-in 500ms var(--ease-out) 500ms both;
+}
+
+.call-timer {
+  display: inline-flex;
+  align-items: center;
+  height: 48px;
+  padding: 0 6px 0 20px;
+  font-weight: 600;
+  font-size: 1.05rem;
+  font-variant-numeric: tabular-nums;
+}
+
+.call-close {
+  display: inline-grid;
+  place-items: center;
+  width: 48px;
+  height: 48px;
+  border: 0;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.1);
+  color: #fff;
+  cursor: pointer;
+  transition: background-color 0.15s;
+}
+
+.call-close:hover {
+  background: rgba(255, 255, 255, 0.22);
+}
+
+@media (max-width: 767px) {
+  .call-view {
+    padding: 28px 10px 10px;
+  }
+
+  .call-orb {
+    width: 150px;
+    height: 150px;
+  }
+
+  .call-title {
+    margin-top: 22px;
+    font-size: 1.35rem;
+  }
+
+  .call-prompts {
+    margin-top: 22px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    transition: none !important;
+    animation: none !important;
+  }
+
+  ::view-transition-group(*),
+  ::view-transition-old(*),
+  ::view-transition-new(*) {
+    animation: none !important;
+  }
+}
+
+/* ------------------------------------------------------------------
+   Edit mode (header "Edit text")
+   ------------------------------------------------------------------ */
+.header-tools {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: 10px;
+}
+
+.edit-toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.tool-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  min-height: 36px;
+  padding: 0 14px;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-pill);
+  background: rgba(255, 255, 255, 0.8);
+  color: var(--color-text);
+  font: inherit;
+  font-size: 0.85rem;
+  font-weight: 500;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: background-color 0.15s, border-color 0.15s;
+}
+
+.tool-btn:hover:not(:disabled) {
+  background: #fff;
+  border-color: #d8cfc2;
+}
+
+.tool-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.tool-btn[aria-pressed='true'] {
+  background: var(--color-orange-tint);
+  border-color: rgba(255, 97, 43, 0.45);
+}
+
+.tool-btn-primary {
+  background: var(--color-orange-strong);
+  border-color: var(--color-orange-strong);
+  color: #fff;
+}
+
+.tool-btn-primary:hover:not(:disabled) {
+  background: #a83508;
+  border-color: #a83508;
+}
+
+.edit-banner {
+  margin: -4px 0 16px;
+  padding: 10px 16px;
+  border-radius: 14px;
+  background: var(--color-orange-tint);
+  color: var(--color-text);
+  font-size: 0.88rem;
+  padding-right: 16px;
+  margin-right: var(--picker-width, 0px);
+}
+
+/* Each editable piece of text gets a dashed outline. */
+.editable {
+  outline: 1.5px dashed rgba(196, 64, 12, 0.55);
+  outline-offset: 3px;
+  border-radius: 4px;
+  cursor: text;
+  transition: background-color 0.15s;
+}
+
+.editable:hover {
+  background: rgba(255, 97, 43, 0.08);
+}
+
+.editable:focus {
+  outline: 2px solid var(--color-focus);
+  background: rgba(255, 255, 255, 0.75);
+}
+
+.persona-card .editable {
+  outline-color: rgba(255, 180, 140, 0.6);
+}
+
+.persona-card .editable:hover,
+.persona-card .editable:focus {
+  background: rgba(255, 255, 255, 0.1);
+}
+
+.persona-card .editable:focus {
+  outline-color: #8fb8ff;
+}
+
+/* Buttons in edit mode: shown, not clickable links; chat shown open. */
+.is-editing.action-primary,
+.is-editing.action-round {
+  cursor: default;
+}
+
+.is-editing.action-round {
+  gap: 10px;
+  padding: 0 26px 0 19px;
+}
+
+.is-editing.action-round .action-label {
+  max-width: none;
+  opacity: 1;
+}
+
+.is-editing .action-label {
+  max-width: none;
+  overflow: visible;
+}
+
+.is-editing .action-label.editable {
+  outline-color: rgba(255, 255, 255, 0.7);
+}
+
+.is-editing.is-disabled .action-label.editable {
+  outline-color: rgba(107, 107, 107, 0.6);
+}
+
+/* Inline editable text inside the prompt quotes. */
+.call-prompts li .editable {
+  padding: 0 2px;
+}
+
+@media (max-width: 767px) {
+  .app-header {
+    flex-wrap: wrap;
+    row-gap: 10px;
+  }
+
+  .header-tools {
+    gap: 6px;
+  }
+
+  /* While editing, the toolbar gets its own row under the logo. */
+  .header-tools:has(.edit-toolbar) {
+    flex-basis: 100%;
+    justify-content: flex-start;
+  }
+
+  .edit-toolbar {
+    gap: 6px;
+  }
+
+  .tool-btn {
+    min-height: 36px;
+    padding: 0 11px;
+    font-size: 0.8rem;
+  }
+
+  .header-tools .badge {
+    display: none;
+  }
+
+  .edit-banner {
+    margin-right: 0;
+  }
+}

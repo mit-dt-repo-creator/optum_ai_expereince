@@ -1,0 +1,6 @@
+# Keep LF line endings in the repo so Windows and Mac/Linux checkouts match.
+* text=auto eol=lf
+*.png binary
+*.jpg binary
+*.webp binary
+*.woff2 binary
