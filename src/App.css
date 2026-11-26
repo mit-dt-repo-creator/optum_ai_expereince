@@ -123,6 +123,19 @@ dd {
   outline-offset: 3px;
 }
 
+/* Text for screen readers only. */
+.visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  margin: -1px;
+  padding: 0;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+  border: 0;
+}
+
 /* ---------- Header ---------- */
 .app-header {
   display: flex;
@@ -407,42 +420,42 @@ dd {
 }
 
 /* Chat hovered or focused: chat opens… */
-a.action-round:hover,
-a.action-round:focus-visible {
+.action-round.is-live:hover,
+.action-round.is-live:focus-visible {
   gap: 10px;
   padding: 0 26px 0 19px;
 }
 
-a.action-round:hover .action-label,
-a.action-round:focus-visible .action-label {
+.action-round.is-live:hover .action-label,
+.action-round.is-live:focus-visible .action-label {
   max-width: 20em; /* room for edited labels */
   opacity: 1;
 }
 
 /* …and the call button folds to its icon. */
-.experience-actions:has(a.action-round:hover, a.action-round:focus-visible) a.action-primary {
+.experience-actions:has(.action-round.is-live:hover, .action-round.is-live:focus-visible) .action-primary.is-live {
   gap: 0;
   padding: 0 20px; /* (60px - 20px icon) / 2 → a circle */
 }
 
-.experience-actions:has(a.action-round:hover, a.action-round:focus-visible)
-  a.action-primary
+.experience-actions:has(.action-round.is-live:hover, .action-round.is-live:focus-visible)
+  .action-primary.is-live
   .action-label {
   max-width: 0;
   opacity: 0;
 }
 
-a.action-primary:hover {
+.action-primary.is-live:hover {
   background: #a83508;
   box-shadow: 0 8px 20px rgba(196, 64, 12, 0.28);
 }
 
-a.action-round:hover {
+.action-round.is-live:hover {
   background: #000;
 }
 
-a.action-primary:active,
-a.action-round:active {
+.action-primary.is-live:active,
+.action-round.is-live:active {
   transform: translateY(1px);
 }
 
@@ -1008,8 +1021,8 @@ a.action-round:active {
 }
 
 /* Gentle lift on the call-to-action. */
-a.action-primary:hover,
-a.action-round:hover {
+.action-primary.is-live:hover,
+.action-round.is-live:hover {
   transform: translateY(-2px);
 }
 
@@ -1437,5 +1450,366 @@ a.action-round:hover {
 
   .edit-banner {
     margin-right: 0;
+  }
+}
+
+/* ------------------------------------------------------------------
+   Simulated demo (no GECX link configured)
+   ------------------------------------------------------------------ */
+.experience-card.is-panel {
+  min-height: var(--card-height);
+}
+
+.sim-chat,
+.sim-call,
+.sim-script {
+  view-transition-name: exp-body;
+  flex: 1 1 auto;
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+}
+
+.sim-badge {
+  display: inline-block;
+  margin-top: 6px;
+  padding: 3px 10px;
+  border-radius: var(--radius-pill);
+  background: var(--color-orange-tint);
+  color: var(--color-text);
+  font-size: 0.75rem;
+  font-weight: 600;
+  letter-spacing: 0.01em;
+}
+
+.sim-badge-center {
+  align-self: center;
+}
+
+.sim-title {
+  font-size: 1.35rem;
+  font-weight: 600;
+  letter-spacing: -0.015em;
+}
+
+/* --- Simulated chat --- */
+.sim-chat {
+  padding: 18px 12px 6px;
+  height: 640px; /* fixed so the conversation scrolls inside the card */
+}
+
+.sim-head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 0 6px 14px;
+  border-bottom: 1px solid var(--color-border);
+}
+
+.sim-icon-btn {
+  flex: 0 0 auto;
+  display: inline-grid;
+  place-items: center;
+  width: 40px;
+  height: 40px;
+  border: 0;
+  border-radius: 50%;
+  background: #f3efe8;
+  color: var(--color-text);
+  cursor: pointer;
+}
+
+.sim-icon-btn:hover {
+  background: #ebe4d8;
+}
+
+.sim-log {
+  flex: 1 1 auto;
+  min-height: 180px;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding: 16px 6px;
+  scroll-behavior: smooth;
+}
+
+.bubble {
+  max-width: 85%;
+  padding: 10px 14px;
+  border-radius: 18px;
+  font-size: 0.98rem;
+  line-height: 1.45;
+  animation: rise-in 280ms var(--ease-out) both;
+}
+
+.bubble-agent {
+  align-self: flex-start;
+  background: #f3efe8;
+  border-bottom-left-radius: 6px;
+}
+
+.bubble-user {
+  align-self: flex-end;
+  background: var(--color-charcoal);
+  color: #fff;
+  border-bottom-right-radius: 6px;
+}
+
+.bubble-typing {
+  display: inline-flex;
+  gap: 5px;
+  padding: 14px 16px;
+}
+
+.bubble-typing span {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: #9a948c;
+  animation: typing-dot 1.1s ease-in-out infinite;
+}
+
+.bubble-typing span:nth-child(2) { animation-delay: 0.15s; }
+.bubble-typing span:nth-child(3) { animation-delay: 0.3s; }
+
+@keyframes typing-dot {
+  0%, 60%, 100% { transform: translateY(0); opacity: 0.5; }
+  30% { transform: translateY(-4px); opacity: 1; }
+}
+
+.sim-suggest {
+  padding: 4px 6px 10px;
+}
+
+.sim-suggest .mono-label {
+  color: var(--color-text-muted);
+  margin-bottom: 8px;
+}
+
+.sim-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.sim-chip {
+  padding: 8px 14px;
+  border: 1px solid #e4d7c8;
+  border-radius: var(--radius-pill);
+  background: #fff;
+  color: var(--color-text);
+  font: inherit;
+  font-size: 0.88rem;
+  line-height: 1.3;
+  text-align: left;
+  cursor: pointer;
+  transition: background-color 0.15s, border-color 0.15s;
+}
+
+.sim-chip:hover:not(:disabled) {
+  background: var(--color-orange-tint);
+  border-color: rgba(255, 97, 43, 0.5);
+}
+
+.sim-chip:disabled {
+  opacity: 0.55;
+  cursor: default;
+}
+
+.sim-chip.is-asked {
+  border-style: dashed;
+}
+
+.sim-input {
+  display: flex;
+  gap: 8px;
+  padding: 10px 4px 4px;
+  border-top: 1px solid var(--color-border);
+}
+
+.sim-input input {
+  flex: 1 1 auto;
+  min-width: 0;
+  height: 48px;
+  padding: 0 18px;
+  border: 1px solid #ddd3c5;
+  border-radius: var(--radius-pill);
+  background: #fff;
+  color: var(--color-text);
+  font: inherit;
+}
+
+.sim-input input:focus-visible {
+  outline: 3px solid var(--color-focus);
+  outline-offset: 1px;
+}
+
+.sim-send {
+  flex: 0 0 auto;
+  display: inline-grid;
+  place-items: center;
+  width: 48px;
+  height: 48px;
+  border: 0;
+  border-radius: 50%;
+  background: var(--color-orange-strong);
+  color: #fff;
+  cursor: pointer;
+}
+
+.sim-send:disabled {
+  background: #ecebe8;
+  color: #8a8782;
+  cursor: default;
+}
+
+/* --- Simulated call --- */
+.sim-call {
+  align-items: center;
+  padding: 34px 22px 20px;
+}
+
+.sim-call .call-orb {
+  width: 170px;
+  height: 170px;
+}
+
+.call-orb.is-speaking {
+  animation: orb-talk 0.9s ease-in-out infinite;
+  box-shadow: 0 0 0 10px rgba(255, 97, 43, 0.12), 0 24px 60px rgba(196, 64, 12, 0.28);
+}
+
+@keyframes orb-talk {
+  0%, 100% { transform: scale(1); }
+  35% { transform: scale(1.06); }
+  60% { transform: scale(1.02); }
+}
+
+.sim-call .call-title {
+  margin-top: 24px;
+}
+
+.sim-status {
+  margin-top: 10px;
+  font-size: 0.88rem;
+  font-weight: 500;
+  color: var(--color-text-muted);
+}
+
+.sim-captions {
+  align-self: stretch;
+  min-height: 112px;
+  margin-top: 16px;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  gap: 8px;
+}
+
+.caption {
+  font-size: 0.98rem;
+  line-height: 1.45;
+  animation: rise-in 280ms var(--ease-out) both;
+}
+
+.caption:not(:last-child) {
+  opacity: 0.55;
+}
+
+.caption-who {
+  display: inline-block;
+  margin-right: 8px;
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--color-orange-strong);
+}
+
+.caption-user .caption-who {
+  color: var(--color-text-muted);
+}
+
+.sim-call-prompts {
+  margin-top: 18px;
+}
+
+.call-end {
+  display: inline-grid;
+  place-items: center;
+  width: 48px;
+  height: 48px;
+  border: 0;
+  border-radius: 50%;
+  background: #c62828; /* end-call red: white icon contrast 5.6:1 */
+  color: #fff;
+  cursor: pointer;
+}
+
+.call-end:hover {
+  background: #a51f1f;
+}
+
+/* --- Script editor (Edit mode) --- */
+.sim-script {
+  padding: 22px 16px 12px;
+  gap: 4px;
+}
+
+.script-block {
+  margin-top: 16px;
+}
+
+.script-block .mono-label {
+  color: var(--color-text-muted);
+  margin-bottom: 6px;
+}
+
+.script-pairs {
+  margin: 0;
+  padding-left: 20px;
+  display: grid;
+  gap: 12px;
+}
+
+.script-user {
+  font-weight: 600;
+}
+
+.script-agent {
+  margin-top: 4px;
+  color: var(--color-text-muted);
+}
+
+.script-tip {
+  margin-top: 4px;
+  font-size: 0.78rem;
+  color: var(--color-text-muted);
+}
+
+.script-labels p:last-child {
+  font-size: 0.88rem;
+  line-height: 2;
+}
+
+.tool-select {
+  padding-right: 10px;
+  appearance: auto;
+}
+
+@media (max-width: 767px) {
+  .sim-chat {
+    height: 600px;
+  }
+
+  .sim-call {
+    padding: 24px 10px 12px;
+  }
+
+  .sim-call .call-orb {
+    width: 130px;
+    height: 130px;
   }
 }

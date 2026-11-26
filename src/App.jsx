@@ -105,25 +105,26 @@ export default function App() {
   const voice = getAgentDestination(categoryId, 'voice');
   const chat = getAgentDestination(categoryId, 'chat');
 
-  // Set after "Call AI Agent" is clicked: the card shows "Try asking" cues.
-  // Presentation only; the call itself runs in the GECX window.
-  const [call, setCall] = useState(null);
-  const activeCall = call?.categoryId === categoryId ? call : null;
+  // What the left card shows instead of its normal view:
+  //   'cues'    "Try asking" cues after launching the real GECX voice agent
+  //   'simCall' / 'simChat'  the simulated demo, when no GECX link is set
+  const [panel, setPanel] = useState(null);
+  const activePanel = panel?.categoryId === categoryId ? panel : null;
 
-  const launchVoice = () =>
-    withTransition('card', () => setCall({ categoryId, startedAt: Date.now() }));
-  const closeCall = useCallback(() => withTransition('card', () => setCall(null)), []);
+  const openPanel = (kind) =>
+    withTransition('card', () => setPanel({ categoryId, kind, startedAt: Date.now() }));
+  const closePanel = useCallback(() => withTransition('card', () => setPanel(null)), []);
 
   const selectCategory = (id) => {
     if (id !== categoryId) {
       withTransition('category', () => {
-        setCall(null);
+        setPanel(null);
         setCategoryId(id);
       });
     }
   };
-  const toggleCues = () =>
-    withTransition('card', () => setCall(activeCall ? null : { categoryId, startedAt: Date.now() }));
+  // Edit mode: choose which view of the card to edit.
+  const previewPanel = (kind) => (kind ? openPanel(kind) : closePanel());
 
   const resetEdits = () => {
     const ok = window.confirm(
@@ -152,8 +153,8 @@ export default function App() {
           <EditToolbar
             editing={editing}
             onToggle={() => setEditing((v) => !v)}
-            cuesOpen={Boolean(activeCall)}
-            onToggleCues={toggleCues}
+            panelKind={activePanel?.kind ?? null}
+            onPreview={previewPanel}
             onReset={resetEdits}
             onExport={() => downloadJson('contentOverrides.json', exportOverrides(edits))}
             editCount={Object.keys(edits).length}
@@ -170,7 +171,9 @@ export default function App() {
           {editing && (
             <p className="edit-banner" role="status">
               Editing: click any text in the two cards to change it. Enter saves, Esc undoes. Clear a
-              field to restore its default. Edits are saved in this browser; use Export to share them.
+              field to restore its default. Use the “Edit” menu to reach the call cues and the
+              simulated call and chat scripts. Edits are saved in this browser; use Export to share
+              them.
             </p>
           )}
 
@@ -182,9 +185,10 @@ export default function App() {
                 ui={ui}
                 voice={voice}
                 chat={chat}
-                call={activeCall}
-                onLaunchVoice={launchVoice}
-                onCloseCall={closeCall}
+                panel={activePanel}
+                onLaunchVoice={() => openPanel('cues')}
+                onSimulate={openPanel}
+                onClosePanel={closePanel}
               />
 
               <section className="persona-area" aria-label="Fictional demo persona">

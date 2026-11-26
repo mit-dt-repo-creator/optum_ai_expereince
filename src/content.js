@@ -21,6 +21,18 @@ export const UI_DEFAULTS = {
   tryAsking: 'Try asking',
   aboutLabel: 'About',
   demoIdPrefix: 'Demo ID',
+  // Simulated demo (used when no GECX link is configured)
+  simHint: 'No live agent links are set, so Call and Chat open a simulated demo.',
+  simCallBadge: 'Simulated call · scripted responses',
+  simChatBadge: 'Simulated chat · scripted responses',
+  simFallback:
+    "I'm a simulated demo, so I can only answer a few sample questions. Try one of the suggestions below.",
+  simSuggestions: 'Suggested questions',
+  simConnecting: 'Connecting…',
+  simSpeaking: 'Agent is speaking',
+  simListening: 'Your turn: pick a question below',
+  simYou: 'You',
+  simAgent: 'Agent',
 };
 
 const STORAGE_KEY = 'optum-ai-experience:text-edits:v1';
@@ -51,6 +63,7 @@ export function buildContent(overrides = {}) {
     title: pick(`cat.${c.id}.title`, c.title),
     description: pick(`cat.${c.id}.description`, c.description),
     agentName: pick(`cat.${c.id}.agentName`, c.agentName),
+    greeting: pick(`cat.${c.id}.greeting`, c.greeting),
     personas: c.personas.map((p) => {
       const base = `persona.${p.id}`;
       return {
@@ -59,6 +72,7 @@ export function buildContent(overrides = {}) {
         demoId: pick(`${base}.demoId`, p.demoId),
         about: pick(`${base}.about`, p.about),
         prompts: p.prompts.map((t, i) => pick(`${base}.prompts.${i}`, t)),
+        answers: p.answers.map((t, i) => pick(`${base}.answers.${i}`, t)),
         details: p.details.map((d, i) => ({
           ...d,
           label: pick(`${base}.details.${i}.label`, d.label),
@@ -79,12 +93,14 @@ function flatten({ ui, categories }) {
     out[`cat.${c.id}.title`] = c.title;
     out[`cat.${c.id}.description`] = c.description;
     out[`cat.${c.id}.agentName`] = c.agentName;
+    out[`cat.${c.id}.greeting`] = c.greeting;
     for (const p of c.personas) {
       const base = `persona.${p.id}`;
       out[`${base}.name`] = p.name;
       out[`${base}.demoId`] = p.demoId;
       out[`${base}.about`] = p.about;
       p.prompts.forEach((t, i) => (out[`${base}.prompts.${i}`] = t));
+      p.answers.forEach((t, i) => (out[`${base}.answers.${i}`] = t));
       p.details.forEach((d, i) => {
         out[`${base}.details.${i}.label`] = d.label;
         out[`${base}.details.${i}.value`] = d.value;

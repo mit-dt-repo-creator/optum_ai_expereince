@@ -1,7 +1,17 @@
-import { Pencil, Check, RotateCcw, Download, MessageSquareText } from 'lucide-react';
+import { useId } from 'react';
+import { Pencil, Check, RotateCcw, Download } from 'lucide-react';
+
+const VIEWS = [
+  { value: '', label: 'Edit: card' },
+  { value: 'cues', label: 'Edit: call cues' },
+  { value: 'simCall', label: 'Edit: simulated call script' },
+  { value: 'simChat', label: 'Edit: simulated chat script' },
+];
 
 /** Header controls for Edit mode. */
-export default function EditToolbar({ editing, onToggle, cuesOpen, onToggleCues, onReset, onExport, editCount }) {
+export default function EditToolbar({ editing, onToggle, panelKind, onPreview, onReset, onExport, editCount }) {
+  const selectId = useId();
+
   if (!editing) {
     return (
       <button type="button" className="tool-btn" onClick={onToggle}>
@@ -13,10 +23,21 @@ export default function EditToolbar({ editing, onToggle, cuesOpen, onToggleCues,
 
   return (
     <div className="edit-toolbar" role="toolbar" aria-label="Text editing">
-      <button type="button" className="tool-btn" onClick={onToggleCues} aria-pressed={cuesOpen}>
-        <MessageSquareText size={16} aria-hidden="true" />
-        {cuesOpen ? 'Hide call cues' : 'Show call cues'}
-      </button>
+      <label htmlFor={selectId} className="visually-hidden">
+        Which view to edit
+      </label>
+      <select
+        id={selectId}
+        className="tool-btn tool-select"
+        value={panelKind ?? ''}
+        onChange={(e) => onPreview(e.target.value || null)}
+      >
+        {VIEWS.map((v) => (
+          <option key={v.value} value={v.value}>
+            {v.label}
+          </option>
+        ))}
+      </select>
       <button type="button" className="tool-btn" onClick={onExport}>
         <Download size={16} aria-hidden="true" />
         Export

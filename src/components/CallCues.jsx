@@ -2,7 +2,7 @@ import { useContext, useEffect, useRef, useState } from 'react';
 import { X } from 'lucide-react';
 import EditableText, { EditContext } from './EditableText.jsx';
 
-function formatElapsed(ms) {
+export function formatElapsed(ms) {
   const total = Math.max(0, Math.floor(ms / 1000));
   const m = Math.floor(total / 60);
   const s = total % 60;

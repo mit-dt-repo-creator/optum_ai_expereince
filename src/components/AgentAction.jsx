@@ -12,8 +12,11 @@ import EditableText, { EditContext } from './EditableText.jsx';
  * the card can show "Try asking" cues. Ctrl/Cmd/Shift-click or middle-click
  * keep the browser's normal link behaviour.
  * Chat: always opens in a new tab.
+ *
+ * No link configured: the button opens the simulated demo (`onSimulate`).
+ * A link that is set but invalid shows a disabled button with the reason.
  */
-export default function AgentAction({ channel, destination, label, onLaunch }) {
+export default function AgentAction({ channel, destination, label, onLaunch, onSimulate }) {
   const noteId = useId();
   const { editing } = useContext(EditContext);
   const isVoice = channel === 'voice';
@@ -28,7 +31,7 @@ export default function AgentAction({ channel, destination, label, onLaunch }) {
     return (
       <span className="action-wrap">
         <span
-          className={`${className} is-editing${destination.status === 'ok' ? '' : ' is-disabled'}`}
+          className={`${className} is-editing${destination.status === 'invalid' ? ' is-disabled' : ''}`}
           data-channel={channel}
         >
           <Icon className="action-icon" size={isVoice ? 20 : 22} aria-hidden="true" />
@@ -39,7 +42,7 @@ export default function AgentAction({ channel, destination, label, onLaunch }) {
             label={isVoice ? 'call button label' : 'chat button label'}
           />
         </span>
-        {destination.status !== 'ok' && <span className="action-note">{destination.message}</span>}
+        {destination.status === 'invalid' && <span className="action-note">{destination.message}</span>}
       </span>
     );
   }
@@ -67,7 +70,7 @@ export default function AgentAction({ channel, destination, label, onLaunch }) {
 
     return (
       <a
-        className={className}
+        className={`${className} is-live`}
         href={destination.href}
         target="_blank"
         rel="noopener noreferrer"
@@ -80,6 +83,22 @@ export default function AgentAction({ channel, destination, label, onLaunch }) {
     );
   }
 
+  // No link configured: open the clearly labelled simulated demo instead.
+  if (destination.status === 'missing' && onSimulate) {
+    return (
+      <button
+        type="button"
+        className={`${className} is-live`}
+        aria-label={`${label} (simulated demo)`}
+        data-channel={channel}
+        onClick={onSimulate}
+      >
+        {content}
+      </button>
+    );
+  }
+
+  // A link is set but invalid: show the configuration problem, don't hide it.
   return (
     <span className="action-wrap">
       <button

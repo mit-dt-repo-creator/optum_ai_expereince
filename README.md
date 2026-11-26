@@ -1,6 +1,6 @@
 # Optum.ai Interactive Experience
 
-A lightweight React + Vite frontend that **launches existing GECX virtual agents**: one voice agent and one chat agent per category (Payer, Provider, Life Sciences). It has no voice engine, chatbot, backend, authentication, or database, and it does not simulate calls or conversations.
+A lightweight React + Vite frontend that **launches existing GECX virtual agents**: one voice agent and one chat agent per category (Payer, Provider, Life Sciences). Where no GECX link is configured, the buttons open a **clearly labelled simulated demo** with scripted replies instead (see "Simulated demo" below). There is no AI service, backend, authentication or database.
 
 > **Deploying?** See [DEPLOY.md](DEPLOY.md) for step-by-step build, hosting and verification instructions.
 
@@ -28,12 +28,25 @@ All launch links are read in one place, [`src/agentConfig.js`](src/agentConfig.j
 | `VITE_GECX_LIFE_SCIENCES_VOICE_URL` | Life Sciences → Call AI Agent |
 | `VITE_GECX_LIFE_SCIENCES_CHAT_URL` | Life Sciences → Chat with AI Agent |
 
-- Each value must be a full `https://` URL. Anything else (empty, `http://`, malformed) disables that button and shows a short message such as "Voice agent link not configured."
+- Each value must be a full `https://` URL.
+- **Empty or not set:** that button opens the simulated demo.
+- **Set but invalid** (`http://`, malformed): the button is disabled and says "link is invalid", so a configuration mistake is visible rather than hidden behind the demo.
 - If one agent serves several categories, put the same URL in each variable.
 - Values are baked in at build time. Rebuild (or restart `npm run dev`) after changing them.
 - Configured actions are regular links that open in a new tab with `rel="noopener noreferrer"`.
 - **Frontend environment variables are public.** Everything in `VITE_*` ends up in the shipped JavaScript. Never put API keys, tokens or other secrets there.
 - No persona or user data is added to the URLs. Persona selection only changes what this page displays; the launched agent knows nothing about it.
+
+## Simulated demo
+
+When a category has no GECX link set, **Call AI Agent** and **Chat with AI Agent** open a simulation inside the card. It is labelled "Simulated call · scripted responses" / "Simulated chat · scripted responses", and a note under the buttons says the demo is simulated.
+
+- **Chat:** the agent greets the selected persona by name. The persona's questions appear as suggestions; clicking one, or typing something with matching keywords, gets its scripted answer after a short "typing" pause. Anything else gets a reply saying it's a demo with a few sample questions.
+- **Call:** after "Connecting…", the agent's lines are spoken with the browser's built-in voice and shown as captions while the orb pulses. The presenter clicks the "Try asking" questions to continue. The bar has a timer, mute, and **End call**. With mute on, or in a browser without speech, captions still advance.
+- Picking another persona restarts the conversation with that persona. Escape closes the chat or ends the call.
+- **Nothing is sent anywhere.** No AI service is involved; all replies come from the script.
+
+**Editing the script:** turn on **Edit text**, then choose **Edit: simulated call script** or **Edit: simulated chat script** from the menu. You can edit each category's greeting (`{name}` becomes the persona's first name), each persona's questions and answers, the "no match" reply, and the status labels. The defaults live in [`src/data.js`](src/data.js) (`greeting`, `prompts`, `answers`).
 
 ## Brand assets to request
 

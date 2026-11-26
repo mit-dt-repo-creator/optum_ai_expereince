@@ -46,7 +46,9 @@ Set them in **one** of these ways:
 - **File on the build machine:** copy `.env.example` to `.env.production.local` and fill in the values. Never commit this file; `.gitignore` already excludes it.
 
 Rules:
-- Each value must be a full `https://` URL. Anything else (empty, `http://`, malformed) shows that button as disabled with "link not configured" or "link is invalid".
+- Each value must be a full `https://` URL.
+- **Left empty:** that button opens a clearly labelled **simulated demo** (scripted replies, no live agent). This lets the site be shown before the GECX links exist.
+- **Set but invalid** (`http://`, malformed): the button is disabled and says "link is invalid".
 - If one agent serves several categories, use the same URL for each.
 - **These values are public.** Anyone can read them in the browser. Never put API keys, tokens or other secrets in any `VITE_*` variable.
 
@@ -142,7 +144,7 @@ Open the deployed URL and confirm:
 
 - [ ] The page loads over HTTPS with no errors in the browser console.
 - [ ] The left navigation shows Payer, Provider and Life Sciences, and switching them updates both cards.
-- [ ] In each category, **Call AI Agent** and **Chat with AI Agent** are active, not grey "not configured" buttons.
+- [ ] In each category, **Call AI Agent** and **Chat with AI Agent** launch the real GECX agents. If a button opens a "Simulated call" or "Simulated chat" instead, its URL wasn't set at build time.
 - [ ] **Call AI Agent** opens the GECX voice agent in a side window (or a new tab), and the card switches to "Try asking" cues.
 - [ ] **Chat with AI Agent** opens the GECX chat agent in a new tab.
 - [ ] The phone layout works (narrow the window or use a phone).
@@ -173,7 +175,7 @@ Restart `npm run dev` after changing `.env.local`.
 
 | Symptom | Likely cause |
 | --- | --- |
-| Buttons say "link not configured" | The variable wasn't set at **build** time, or the build ran before it was set. Rebuild. |
+| Buttons open the simulated demo instead of GECX | The variable wasn't set at **build** time, or the build ran before it was set. Rebuild. |
 | Buttons say "link is invalid" | The URL isn't a full `https://` address. |
 | Old content still showing after a deploy | `index.html` is being cached. Apply the `no-cache` header above. |
 | Blank page at a sub-path | Set `base` in `vite.config.js` to that sub-path and rebuild. |
