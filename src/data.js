@@ -13,6 +13,10 @@
  * labelled simulated demo. `greeting` ({name} = persona first name) opens the
  * conversation, and `answers[i]` is the scripted reply to `prompts[i]`.
  *
+ * Live-agent handoff: asking for a person in the simulation transfers to
+ * `specialist`, and the right card shows the agent assist panel built from
+ * `assist` (tone: "warning" | "neutral" | "success" colours the sentiment chip).
+ *
  * Portraits: set a persona's photo to a licensed image in public/personas/,
  * e.g. photo: '/personas/jordan-ellis.jpg'. Leave it null to show initials.
  */
@@ -26,6 +30,7 @@ export const categories = [
       'Explore AI-powered experiences for member services, benefits, claims, and prior authorization.',
     icon: 'payer',
     greeting: "Hi {name}, thanks for contacting your health plan's AI agent. How can I help you today?",
+    specialist: "Morgan · Member Services",
     profileHeading: 'Fictional member profile',
     personas: [
       {
@@ -44,6 +49,17 @@ export const categories = [
           "Your prior authorization request is with our clinical review team. Decisions usually take up to 5 business days, and I can text you as soon as it is decided.",
           "You can appeal within 180 days of the denial. I can start the appeal now and send you a checklist of what to include, such as a letter of medical necessity from your doctor.",
         ],
+        assist: {
+          segment: "PPO member",
+          verification: "Identity verified (DOB, last 4)",
+          intent: "Claim denial, appeal",
+          sentiment: "Frustrated",
+          tone: "warning",
+          summary: "Jordan asked why claim DEMO-CLM-2207 from Lakeside Imaging Center was denied. The AI explained the MRI was done before prior authorization was approved, and that the claim can be reprocessed once it is.",
+          steps: ["Check the prior authorization status", "Offer to reprocess the claim after approval", "Start an appeal if it stays denied"],
+          knowledge: ["Appeals: 180-day filing window", "Reprocessing claims after prior authorization"],
+          opening: "Hi Jordan, I've read your conversation, so there's no need to repeat anything. Let's get your imaging claim sorted out.",
+        },
         details: [
           { label: 'DOB', value: 'March 4, 1981' },
           { label: 'Last 4 SSN', value: '0000' },
@@ -67,6 +83,17 @@ export const categories = [
           "I found three in-network dermatologists within 10 miles. The closest is Riverside Dermatology, about 2 miles away, with openings next week.",
           "With a referral, an in-network specialist visit has a $40 copay on your plan. Without a referral, the visit may not be covered.",
         ],
+        assist: {
+          segment: "HMO member",
+          verification: "Identity verified (DOB)",
+          intent: "Specialist referral",
+          sentiment: "Neutral",
+          tone: "neutral",
+          summary: "Priya is a new member who wants to see a dermatologist. The AI explained that her HMO plan needs a referral from her primary care provider and shared nearby in-network options and the $40 specialist copay.",
+          steps: ["Confirm her primary care provider", "Send the referral request", "Help her book with Riverside Dermatology"],
+          knowledge: ["HMO referral requirements", "Finding in-network specialists"],
+          opening: "Hi Priya, I can see you're looking for a dermatologist. I'll start your referral and help you book a visit.",
+        },
         details: [
           { label: 'DOB', value: 'July 22, 1993' },
           { label: 'Plan type', value: 'HMO (sample)' },
@@ -90,6 +117,17 @@ export const categories = [
           "Main Street Pharmacy shows prescription DEMO-RX-5531 as ready for pickup. They will hold it for 7 days.",
           "Yes. You can get a 90-day supply through home delivery for $20, which saves you about $10 every three months. Would you like me to set that up?",
         ],
+        assist: {
+          segment: "Medicare Advantage member",
+          verification: "Identity verified (DOB)",
+          intent: "Prescription coverage",
+          sentiment: "Positive",
+          tone: "success",
+          summary: "Marcus asked about coverage for a new prescription. The AI confirmed it is Tier 2 with a $10 copay, that DEMO-RX-5531 is ready at Main Street Pharmacy, and that 90-day home delivery is available.",
+          steps: ["Confirm the prescription details", "Offer to set up 90-day home delivery", "Note his preferred pharmacy"],
+          knowledge: ["Drug tiers and copays", "Home delivery enrollment"],
+          opening: "Hi Marcus, thanks for holding. I can set up home delivery for your new prescription right now.",
+        },
         details: [
           { label: 'DOB', value: 'November 9, 1954' },
           { label: 'Plan type', value: 'Medicare Advantage (sample)' },
@@ -108,6 +146,7 @@ export const categories = [
       'Explore AI-powered experiences for patient access, appointment support, and administrative workflows.',
     icon: 'provider',
     greeting: "Hello {name}, you've reached the clinic's AI support agent. What can I help you with?",
+    specialist: "Riley · Patient Access",
     profileHeading: 'Fictional patient-access scenario',
     personas: [
       {
@@ -126,6 +165,17 @@ export const categories = [
           "Yes. There are weekday morning openings on Tuesday at 9:00, Wednesday at 8:30 and Friday at 10:15. Which works best for you?",
           "Please bring a photo ID, your insurance card, a list of your current medications and any recent records. Plan to arrive 15 minutes early for check-in.",
         ],
+        assist: {
+          segment: "New patient",
+          verification: "Contact details confirmed",
+          intent: "New patient appointment",
+          sentiment: "Positive",
+          tone: "success",
+          summary: "Alex wants a first primary care visit on a weekday morning. The AI offered openings on Tuesday, Wednesday and Friday mornings and explained what to bring.",
+          steps: ["Confirm insurance on file", "Book the preferred morning slot", "Send new-patient forms"],
+          knowledge: ["New patient scheduling guidelines", "Pre-visit checklist"],
+          opening: "Hi Alex, welcome! Let's get your first visit booked. Which morning works best for you?",
+        },
         details: [
           { label: 'Visit type', value: 'Annual wellness' },
           { label: 'Department', value: 'Primary care' },
@@ -149,6 +199,17 @@ export const categories = [
           "Yes, knee arthroscopy needs prior authorization on this plan. Standard reviews take up to 5 business days, so submitting today keeps you on track for Tuesday.",
           "I'll need the procedure and diagnosis codes, the ordering physician's notes, recent imaging results and the planned date of service.",
         ],
+        assist: {
+          segment: "Orthopedics clinic office manager",
+          verification: "Office verified (provider ID on file)",
+          intent: "Eligibility and prior authorization",
+          sentiment: "Time-sensitive",
+          tone: "warning",
+          summary: "Dana is checking eligibility for a knee arthroscopy scheduled next Tuesday. The AI confirmed coverage is active and that the procedure needs prior authorization, which takes up to 5 business days.",
+          steps: ["Start the prior authorization today", "List the documents still needed", "Flag the Tuesday date of service"],
+          knowledge: ["Outpatient surgery authorization rules", "Required clinical documentation"],
+          opening: "Hi Dana, I see the procedure is next Tuesday. Let's submit the authorization now so you stay on schedule.",
+        },
         details: [
           { label: 'Role', value: 'Office manager' },
           { label: 'Practice', value: 'Orthopedics clinic' },
@@ -172,6 +233,17 @@ export const categories = [
           "The next openings with your cardiologist are Monday at 11:00 AM and Tuesday at 3:15 PM. Shall I move your visit to one of those?",
           "Yes, this follow-up can be a video visit. I'll send you a link and setup instructions by text and email.",
         ],
+        assist: {
+          segment: "Returning cardiology patient",
+          verification: "Identity verified (DOB)",
+          intent: "Reschedule follow-up",
+          sentiment: "Neutral",
+          tone: "neutral",
+          summary: "Samuel needs to move his Thursday 2:30 PM cardiology follow-up. The AI offered Monday at 11:00 AM and Tuesday at 3:15 PM, and confirmed a video visit is possible.",
+          steps: ["Confirm the new time", "Offer a video visit", "Send the updated confirmation"],
+          knowledge: ["Cardiology rescheduling policy", "Video visit setup"],
+          opening: "Hi Samuel, I can move your follow-up for you. Would Monday at 11 or a video visit work better?",
+        },
         details: [
           { label: 'Department', value: 'Cardiology' },
           { label: 'Visit type', value: 'Follow-up' },
@@ -190,6 +262,7 @@ export const categories = [
       'Explore AI-powered experiences for product information, patient support, and program navigation.',
     icon: 'lifeSciences',
     greeting: "Hi {name}, welcome to the patient support AI agent. How can I help today?",
+    specialist: "Sam · Patient Support",
     profileHeading: 'Fictional support inquiry',
     personas: [
       {
@@ -208,6 +281,17 @@ export const categories = [
           "You may qualify for copay assistance that lowers your out-of-pocket cost. I can check your eligibility now. It takes about two minutes.",
           "Yes. I can set up refill reminders by text or phone call, 5 days before you're due. Which would you prefer?",
         ],
+        assist: {
+          segment: "Newly enrolled patient",
+          verification: "Enrollment verified",
+          intent: "Program onboarding",
+          sentiment: "Positive",
+          tone: "success",
+          summary: "Taylor recently enrolled in the support program and asked about next steps, copay help and refill reminders. The AI explained the care coordinator call and offered an eligibility check.",
+          steps: ["Introduce the care coordinator", "Check copay assistance eligibility", "Set up refill reminders"],
+          knowledge: ["Program onboarding steps", "Copay assistance criteria"],
+          opening: "Hi Taylor, welcome to the program. I'm your care coordinator, and I'll walk you through what happens next.",
+        },
         details: [
           { label: 'Inquirer', value: 'Patient' },
           { label: 'Program', value: 'Support program (sample)' },
@@ -231,6 +315,17 @@ export const categories = [
           "Dosing guidance is in section 2 of the prescribing information. For product-specific questions, I can also connect you with a medical information specialist.",
           "I can request a visit from a medical science liaison. Share your preferred dates and a liaison will confirm within 2 business days.",
         ],
+        assist: {
+          segment: "Healthcare professional",
+          verification: "Prescriber verified (license on file)",
+          intent: "Product information",
+          sentiment: "Neutral",
+          tone: "neutral",
+          summary: "Dr. Castillo requested the prescribing information and dosing guidance, and asked about a visit from a medical science liaison. The AI offered to email the documents.",
+          steps: ["Send the prescribing information", "Route dosing questions to medical information", "Request a liaison visit"],
+          knowledge: ["Medical information request process", "Liaison visit scheduling"],
+          opening: "Hello Dr. Castillo, I can send the prescribing information now and arrange a liaison visit for you.",
+        },
         details: [
           { label: 'Inquirer', value: 'Healthcare professional' },
           { label: 'Specialty', value: 'Rheumatology' },
@@ -254,6 +349,17 @@ export const categories = [
           "You'll need proof of current insurance, recent income information and the prescriber's signature on the renewal form.",
           "If the deadline passes, benefits pause until the renewal is approved. To avoid a gap, submit it at least a week before the end of the month.",
         ],
+        assist: {
+          segment: "Caregiver",
+          verification: "Caregiver authorization on file",
+          intent: "Program renewal",
+          sentiment: "Worried",
+          tone: "warning",
+          summary: "Chris is renewing a family member's access-program enrollment before the end-of-month deadline. The AI listed the documents needed and explained that benefits pause if the deadline passes.",
+          steps: ["Start the renewal with Chris", "Confirm the documents on hand", "Note the end-of-month deadline"],
+          knowledge: ["Program renewal checklist", "Caregiver authorization rules"],
+          opening: "Hi Chris, let's complete the renewal together so there's no gap in benefits.",
+        },
         details: [
           { label: 'Inquirer', value: 'Caregiver' },
           { label: 'Program', value: 'Access support (sample)' },

@@ -1,16 +1,19 @@
 import { useEffect, useId, useRef, useState } from 'react';
 import { Send, X } from 'lucide-react';
-import { matchPrompt, personalize, prefersReducedMotion, readingTime } from '../sim.js';
+import { isLiveAgentRequest, matchPrompt, personalize, prefersReducedMotion, readingTime } from '../sim.js';
 
 /**
  * Simulated chat: scripted replies only (see sim.js). Shown when no GECX chat
- * link is configured, and labelled as a simulation.
+ * link is configured, and labelled as a simulation. Asking for a live agent
+ * hands the conversation to `onHandoff(transcript)`.
  */
-export default function SimChat({ agentName, persona, greeting, ui, onClose }) {
+export default function SimChat({ agentName, persona, greeting, ui, onClose, onHandoff }) {
   const [messages, setMessages] = useState([]);
   const [typing, setTyping] = useState(false);
   const [draft, setDraft] = useState('');
   const [asked, setAsked] = useState([]);
+  const [handingOff, setHandingOff] = useState(false);
+  const transcript = useRef([]);
   const timers = useRef([]);
   const logRef = useRef(null);
   const inputRef = useRef(null);
@@ -18,14 +21,18 @@ export default function SimChat({ agentName, persona, greeting, ui, onClose }) {
   const nextId = useRef(0);
 
   const later = (fn, ms) => timers.current.push(setTimeout(fn, ms));
-  const add = (who, text) => setMessages((m) => [...m, { id: nextId.current++, who, text }]);
+  const add = (who, text) => {
+    transcript.current = [...transcript.current, { who, text }];
+    setMessages((m) => [...m, { id: nextId.current++, who, text }]);
+  };
 
-  const agentSays = (text) => {
+  const agentSays = (text, then) => {
     setTyping(true);
     const delay = prefersReducedMotion() ? 300 : Math.min(1800, 500 + readingTime(text) / 4);
     later(() => {
       setTyping(false);
       add('agent', text);
+      then?.();
     }, delay);
   };
 
@@ -53,8 +60,13 @@ export default function SimChat({ agentName, persona, greeting, ui, onClose }) {
 
   const ask = (text, index) => {
     const question = text.trim();
-    if (!question || typing) return;
+    if (!question || typing || handingOff) return;
     add('user', question);
+    if (index === 'live' || (index === undefined && isLiveAgentRequest(question))) {
+      setHandingOff(true);
+      agentSays(ui.handoffLine, () => later(() => onHandoff?.(transcript.current), 1200));
+      return;
+    }
     const i = index ?? matchPrompt(question, persona.prompts);
     if (i >= 0) setAsked((a) => (a.includes(i) ? a : [...a, i]));
     agentSays(i >= 0 ? persona.answers[i] : ui.simFallback);
@@ -92,7 +104,7 @@ export default function SimChat({ agentName, persona, greeting, ui, onClose }) {
         )}
       </div>
 
-      {suggestions.length > 0 && (
+      {!handingOff && (
         <div className="sim-suggest">
           <p className="mono-label">{ui.simSuggestions}</p>
           <div className="sim-chips">
@@ -101,6 +113,16 @@ export default function SimChat({ agentName, persona, greeting, ui, onClose }) {
                 {p}
               </button>
             ))}
+            {onHandoff && (
+              <button
+                type="button"
+                className="sim-chip sim-chip-live"
+                disabled={typing}
+                onClick={() => ask(ui.liveAgentPrompt, 'live')}
+              >
+                {ui.liveAgentPrompt}
+              </button>
+            )}
           </div>
         </div>
       )}
@@ -125,8 +147,14 @@ export default function SimChat({ agentName, persona, greeting, ui, onClose }) {
           placeholder="Type a message"
           autoComplete="off"
           maxLength={300}
+          disabled={handingOff}
         />
-        <button type="submit" className="sim-send" disabled={!draft.trim() || typing} aria-label="Send">
+        <button
+          type="submit"
+          className="sim-send"
+          disabled={!draft.trim() || typing || handingOff}
+          aria-label="Send"
+        >
           <Send size={18} aria-hidden="true" />
         </button>
       </form>

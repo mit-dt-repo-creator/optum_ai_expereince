@@ -6,6 +6,7 @@ const VIEWS = [
   { value: 'cues', label: 'Edit: call cues' },
   { value: 'simCall', label: 'Edit: simulated call script' },
   { value: 'simChat', label: 'Edit: simulated chat script' },
+  { value: 'handoff', label: 'Edit: live-agent handoff and agent assist' },
 ];
 
 /** Header controls for Edit mode. */

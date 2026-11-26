@@ -7,10 +7,11 @@ import { formatElapsed } from './CallCues.jsx';
  * Simulated voice call: the agent's scripted lines are spoken with the
  * browser's built-in voice and shown as captions; the presenter picks the
  * questions. Shown when no GECX voice link is configured, and labelled as a
- * simulation.
+ * simulation. Asking for a live agent hands the call to
+ * `onHandoff(transcript)`.
  */
-export default function SimCall({ agentName, persona, greeting, ui, startedAt, onEnd }) {
-  const [phase, setPhase] = useState('connecting'); // connecting | speaking | listening
+export default function SimCall({ agentName, persona, greeting, ui, startedAt, onEnd, onHandoff }) {
+  const [phase, setPhase] = useState('connecting'); // connecting | speaking | listening | handoff
   const [lines, setLines] = useState([]);
   const [muted, setMuted] = useState(false);
   const [asked, setAsked] = useState([]);
@@ -19,15 +20,21 @@ export default function SimCall({ agentName, persona, greeting, ui, startedAt, o
   const cancelSpeech = useRef(null);
   const timers = useRef([]);
   const endRef = useRef(null);
+  const transcript = useRef([]);
 
   const later = (fn, ms) => timers.current.push(setTimeout(fn, ms));
 
-  const say = (text) => {
-    setLines((l) => [...l, { who: 'agent', text }]);
+  const addLine = (who, text) => {
+    transcript.current = [...transcript.current, { who, text }];
+    setLines((l) => [...l, { who, text }]);
+  };
+
+  const say = (text, then) => {
+    addLine('agent', text);
     setPhase('speaking');
     cancelSpeech.current = speak(text, {
       muted: mutedRef.current,
-      onDone: () => setPhase('listening'),
+      onDone: () => (then ? then() : setPhase('listening')),
     });
   };
 
@@ -57,9 +64,23 @@ export default function SimCall({ agentName, persona, greeting, ui, startedAt, o
   const ask = (i) => {
     if (phase !== 'listening') return;
     setAsked((a) => (a.includes(i) ? a : [...a, i]));
-    setLines((l) => [...l, { who: 'user', text: persona.prompts[i] }]);
+    addLine('user', persona.prompts[i]);
     setPhase('speaking');
     later(() => say(persona.answers[i]), 700);
+  };
+
+  const askForPerson = () => {
+    if (phase !== 'listening') return;
+    addLine('user', ui.liveAgentPrompt);
+    setPhase('speaking');
+    later(
+      () =>
+        say(ui.handoffLine, () => {
+          setPhase('handoff');
+          later(() => onHandoff?.(transcript.current), 600);
+        }),
+      700,
+    );
   };
 
   const toggleMute = () => {
@@ -70,7 +91,13 @@ export default function SimCall({ agentName, persona, greeting, ui, startedAt, o
   };
 
   const status =
-    phase === 'connecting' ? ui.simConnecting : phase === 'speaking' ? ui.simSpeaking : ui.simListening;
+    phase === 'connecting'
+      ? ui.simConnecting
+      : phase === 'listening'
+        ? ui.simListening
+        : phase === 'handoff'
+          ? ui.transferring
+          : ui.simSpeaking;
   const recent = lines.slice(-3);
 
   return (
@@ -108,6 +135,16 @@ export default function SimCall({ agentName, persona, greeting, ui, startedAt, o
               {p}
             </button>
           ))}
+          {onHandoff && (
+            <button
+              type="button"
+              className="sim-chip sim-chip-live"
+              disabled={phase !== 'listening'}
+              onClick={askForPerson}
+            >
+              {ui.liveAgentPrompt}
+            </button>
+          )}
         </div>
       </div>
 

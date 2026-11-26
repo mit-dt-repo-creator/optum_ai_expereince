@@ -5,6 +5,7 @@ import CallCues from './CallCues.jsx';
 import SimCall from './SimCall.jsx';
 import SimChat from './SimChat.jsx';
 import SimScript from './SimScript.jsx';
+import TransferView from './TransferView.jsx';
 import EditableText, { EditContext } from './EditableText.jsx';
 
 const ICONS = { payer: ShieldPlus, provider: Stethoscope, lifeSciences: FlaskConical };
@@ -15,6 +16,7 @@ const ICONS = { payer: ShieldPlus, provider: Stethoscope, lifeSciences: FlaskCon
  *   'cues'     "Try asking" cues after launching the real GECX voice agent
  *   'simCall'  simulated voice call (no GECX voice link configured)
  *   'simChat'  simulated chat (no GECX chat link configured)
+ *   'handoff'  transfer to a live agent (from the simulation)
  */
 export default function ExperienceCard({
   category,
@@ -26,6 +28,7 @@ export default function ExperienceCard({
   onLaunchVoice,
   onSimulate,
   onClosePanel,
+  onHandoff,
 }) {
   const Icon = ICONS[category.icon] ?? Stethoscope;
   const anyLive = voice.status === 'ok' || chat.status === 'ok';
@@ -37,10 +40,14 @@ export default function ExperienceCard({
   // When a panel closes, put keyboard focus back on the button that opened it.
   useEffect(() => {
     if (lastPanel.current && !panel) {
-      const channel = lastPanel.current === 'simChat' ? 'chat' : 'voice';
-      cardRef.current?.querySelector(`[data-channel="${channel}"]`)?.focus({ preventScroll: true });
+      cardRef.current?.querySelector(`[data-channel="${lastPanel.current}"]`)?.focus({ preventScroll: true });
     }
-    lastPanel.current = panel?.kind ?? null;
+    // Remember which button opened the panel (a handoff keeps its channel).
+    lastPanel.current = !panel
+      ? null
+      : panel.kind === 'simChat' || (panel.kind === 'handoff' && panel.channel === 'chat')
+        ? 'chat'
+        : 'voice';
   }, [panel]);
 
   const kind = panel?.kind ?? null;
@@ -52,7 +59,11 @@ export default function ExperienceCard({
   };
 
   let content;
-  if (kind === 'cues') {
+  if (kind === 'handoff') {
+    content = (
+      <TransferView category={category} persona={persona} ui={ui} panel={panel} onEnd={onClosePanel} />
+    );
+  } else if (kind === 'cues') {
     content = (
       <CallCues
         categoryId={category.id}
@@ -68,10 +79,23 @@ export default function ExperienceCard({
   } else if (kind === 'simCall') {
     // Keyed by persona so picking another persona starts a fresh call.
     content = (
-      <SimCall key={persona.id} {...simProps} startedAt={panel.startedAt} onEnd={onClosePanel} />
+      <SimCall
+        key={persona.id}
+        {...simProps}
+        startedAt={panel.startedAt}
+        onEnd={onClosePanel}
+        onHandoff={(transcript) => onHandoff('voice', transcript)}
+      />
     );
   } else if (kind === 'simChat') {
-    content = <SimChat key={persona.id} {...simProps} onClose={onClosePanel} />;
+    content = (
+      <SimChat
+        key={persona.id}
+        {...simProps}
+        onClose={onClosePanel}
+        onHandoff={(transcript) => onHandoff('chat', transcript)}
+      />
+    );
   } else {
     content = (
       <>
@@ -134,6 +158,7 @@ export default function ExperienceCard({
     cues: `${category.agentName} suggestions`,
     simCall: `${category.agentName}, simulated call`,
     simChat: `${category.agentName}, simulated chat`,
+    handoff: `${ui.transferring}, simulated`,
   };
 
   return (

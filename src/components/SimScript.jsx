@@ -62,6 +62,21 @@ export default function SimScript({ kind, categoryId, agentName, greeting, perso
       </section>
 
       <section className="script-block">
+        <p className="mono-label">Asking for a live agent (all personas)</p>
+        <EditableText
+          as="p"
+          className="script-user"
+          k="ui.liveAgentPrompt"
+          value={ui.liveAgentPrompt}
+          label="live agent question"
+        />
+        <EditableText as="p" className="script-agent" k="ui.handoffLine" value={ui.handoffLine} label="handoff reply" />
+        <p className="script-tip">
+          Typed messages such as &ldquo;real person&rdquo; or &ldquo;representative&rdquo; also start the handoff.
+        </p>
+      </section>
+
+      <section className="script-block">
         <p className="mono-label">Reply when a typed message matches no question</p>
         <EditableText as="p" className="script-agent" k="ui.simFallback" value={ui.simFallback} label="fallback reply" />
       </section>

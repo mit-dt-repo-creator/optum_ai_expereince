@@ -38,6 +38,19 @@ export function matchPrompt(text, prompts) {
   return best;
 }
 
+/**
+ * Does free text ask for a human? ("live agent", "real person",
+ * "representative", "talk to someone", ...)
+ */
+export function isLiveAgentRequest(text) {
+  const t = String(text).toLowerCase();
+  return (
+    /\b(live|real|human)\s+(agent|person|rep|representative|being)\b/.test(t) ||
+    /\b(representative|operator|human)\b/.test(t) ||
+    /\b(speak|talk)\s+(to|with)\s+(a\s+)?(someone|somebody|person|agent|specialist)\b/.test(t)
+  );
+}
+
 /** How the agent addresses the persona: first name, or "Dr. Lastname". */
 export function addressName(fullName) {
   const parts = String(fullName).trim().split(/\s+/);

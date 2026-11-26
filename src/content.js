@@ -33,9 +33,39 @@ export const UI_DEFAULTS = {
   simListening: 'Your turn: pick a question below',
   simYou: 'You',
   simAgent: 'Agent',
+  // Live-agent handoff and agent assist panel
+  liveAgentPrompt: 'Can I speak to a live agent?',
+  handoffLine:
+    "Of course. I'm connecting you with a specialist now. I've shared our conversation, so you won't need to repeat anything.",
+  transferring: 'Transferring to a live agent',
+  transferWaiting: 'Waiting for the next available specialist…',
+  connectedTo: 'Connected to',
+  assistTitle: 'Agent assist',
+  assistBadge: 'Simulated',
+  assistWaiting: 'Waiting',
+  assistConnected: 'Connected',
+  assistAccept: 'Accept transfer',
+  assistReason: 'Reason: asked for a person',
+  assistIntent: 'Intent',
+  assistSentiment: 'Sentiment',
+  assistSummary: 'AI handoff summary',
+  assistSteps: 'Suggested next steps',
+  assistKnowledge: 'Knowledge',
+  assistOpening: 'Suggested opening',
+  assistTranscript: 'Recent transcript',
+  assistVia: 'via',
+  assistViaVoice: 'voice AI agent',
+  assistViaChat: 'chat AI agent',
+  assistPoweredBy: 'Powered by Optum.ai · fictional data',
+  assistCaseNote: 'Add case note',
+  assistWrapUp: 'Wrap up',
+  assistNoteLabel: 'Case note',
 };
 
 const STORAGE_KEY = 'optum-ai-experience:text-edits:v1';
+
+/** Single-text fields of a persona's agent assist data that can be edited. */
+const ASSIST_TEXT_FIELDS = ['segment', 'verification', 'intent', 'sentiment', 'summary', 'opening'];
 const MAX_LENGTH = 2000;
 
 /** Keep only string values under string keys, trimmed to a sane length. */
@@ -64,6 +94,7 @@ export function buildContent(overrides = {}) {
     description: pick(`cat.${c.id}.description`, c.description),
     agentName: pick(`cat.${c.id}.agentName`, c.agentName),
     greeting: pick(`cat.${c.id}.greeting`, c.greeting),
+    specialist: pick(`cat.${c.id}.specialist`, c.specialist),
     personas: c.personas.map((p) => {
       const base = `persona.${p.id}`;
       return {
@@ -73,6 +104,14 @@ export function buildContent(overrides = {}) {
         about: pick(`${base}.about`, p.about),
         prompts: p.prompts.map((t, i) => pick(`${base}.prompts.${i}`, t)),
         answers: p.answers.map((t, i) => pick(`${base}.answers.${i}`, t)),
+        assist: {
+          ...p.assist,
+          ...Object.fromEntries(
+            ASSIST_TEXT_FIELDS.map((k) => [k, pick(`${base}.assist.${k}`, p.assist[k])]),
+          ),
+          steps: p.assist.steps.map((t, i) => pick(`${base}.assist.steps.${i}`, t)),
+          knowledge: p.assist.knowledge.map((t, i) => pick(`${base}.assist.knowledge.${i}`, t)),
+        },
         details: p.details.map((d, i) => ({
           ...d,
           label: pick(`${base}.details.${i}.label`, d.label),
@@ -94,6 +133,7 @@ function flatten({ ui, categories }) {
     out[`cat.${c.id}.description`] = c.description;
     out[`cat.${c.id}.agentName`] = c.agentName;
     out[`cat.${c.id}.greeting`] = c.greeting;
+    out[`cat.${c.id}.specialist`] = c.specialist;
     for (const p of c.personas) {
       const base = `persona.${p.id}`;
       out[`${base}.name`] = p.name;
@@ -101,6 +141,9 @@ function flatten({ ui, categories }) {
       out[`${base}.about`] = p.about;
       p.prompts.forEach((t, i) => (out[`${base}.prompts.${i}`] = t));
       p.answers.forEach((t, i) => (out[`${base}.answers.${i}`] = t));
+      ASSIST_TEXT_FIELDS.forEach((k) => (out[`${base}.assist.${k}`] = p.assist[k]));
+      p.assist.steps.forEach((t, i) => (out[`${base}.assist.steps.${i}`] = t));
+      p.assist.knowledge.forEach((t, i) => (out[`${base}.assist.knowledge.${i}`] = t));
       p.details.forEach((d, i) => {
         out[`${base}.details.${i}.label`] = d.label;
         out[`${base}.details.${i}.value`] = d.value;

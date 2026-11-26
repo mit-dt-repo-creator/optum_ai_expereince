@@ -15,6 +15,8 @@ import ExperienceCard from './components/ExperienceCard.jsx';
 import PersonaCard from './components/PersonaCard.jsx';
 import PersonaSelector from './components/PersonaSelector.jsx';
 import EditToolbar from './components/EditToolbar.jsx';
+import AssistPanel from './components/AssistPanel.jsx';
+import { personalize } from './sim.js';
 import { EditContext } from './components/EditableText.jsx';
 
 function downloadJson(filename, data) {
@@ -115,6 +117,17 @@ export default function App() {
     withTransition('card', () => setPanel({ categoryId, kind, startedAt: Date.now() }));
   const closePanel = useCallback(() => withTransition('card', () => setPanel(null)), []);
 
+  // Simulated live-agent handoff: the left card shows the transfer and the
+  // right card flips to the agent assist panel.
+  const startHandoff = (channel, transcript) =>
+    withTransition('handoff', () =>
+      setPanel({ categoryId, kind: 'handoff', channel, transcript, startedAt: Date.now(), acceptedAt: null }),
+    );
+  const acceptTransfer = () =>
+    withTransition('card', () =>
+      setPanel((p) => (p?.kind === 'handoff' ? { ...p, acceptedAt: Date.now() } : p)),
+    );
+
   const selectCategory = (id) => {
     if (id !== categoryId) {
       withTransition('category', () => {
@@ -124,7 +137,19 @@ export default function App() {
     }
   };
   // Edit mode: choose which view of the card to edit.
-  const previewPanel = (kind) => (kind ? openPanel(kind) : closePanel());
+  const previewPanel = (kind) => {
+    if (kind === 'handoff') {
+      // A sample conversation so the panel has a transcript to show.
+      startHandoff('chat', [
+        { who: 'agent', text: personalize(category.greeting, persona.name) },
+        { who: 'user', text: persona.prompts[0] },
+        { who: 'agent', text: persona.answers[0] },
+        { who: 'user', text: ui.liveAgentPrompt },
+        { who: 'agent', text: ui.handoffLine },
+      ]);
+    } else if (kind) openPanel(kind);
+    else closePanel();
+  };
 
   const resetEdits = () => {
     const ok = window.confirm(
@@ -138,9 +163,11 @@ export default function App() {
 
   const selectPersona = (id) => {
     if (id !== persona.id) {
-      withTransition('persona', () =>
-        setPersonaByCategory((prev) => ({ ...prev, [categoryId]: id })),
-      );
+      withTransition('persona', () => {
+        // A handoff belongs to one persona; switching persona ends it.
+        if (panel?.kind === 'handoff') setPanel(null);
+        setPersonaByCategory((prev) => ({ ...prev, [categoryId]: id }));
+      });
     }
   };
 
@@ -178,7 +205,9 @@ export default function App() {
           )}
 
           <EditContext.Provider value={editContext}>
-            <div className={`stage${editing ? ' is-editing' : ''}`}>
+            <div
+              className={`stage${editing ? ' is-editing' : ''}${activePanel?.kind === 'handoff' ? ' has-assist' : ''}`}
+            >
               <ExperienceCard
                 category={category}
                 persona={persona}
@@ -189,15 +218,28 @@ export default function App() {
                 onLaunchVoice={() => openPanel('cues')}
                 onSimulate={openPanel}
                 onClosePanel={closePanel}
+                onHandoff={startHandoff}
               />
 
               <section className="persona-area" aria-label="Fictional demo persona">
-                <PersonaCard
-                  persona={persona}
-                  tone={personaIndex}
-                  heading={category.profileHeading}
-                  ui={ui}
-                />
+                {activePanel?.kind === 'handoff' ? (
+                  <AssistPanel
+                    category={category}
+                    persona={persona}
+                    tone={personaIndex}
+                    ui={ui}
+                    panel={activePanel}
+                    onAccept={acceptTransfer}
+                    onEnd={closePanel}
+                  />
+                ) : (
+                  <PersonaCard
+                    persona={persona}
+                    tone={personaIndex}
+                    heading={category.profileHeading}
+                    ui={ui}
+                  />
+                )}
                 <PersonaSelector
                   personas={category.personas}
                   selectedId={persona.id}

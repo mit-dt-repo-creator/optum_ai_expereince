@@ -46,6 +46,19 @@ When a category has no GECX link set, **Call AI Agent** and **Chat with AI Agent
 - Picking another persona restarts the conversation with that persona. Escape closes the chat or ends the call.
 - **Nothing is sent anywhere.** No AI service is involved; all replies come from the script.
 
+### Live-agent handoff and agent assist panel
+
+In the simulated call or chat, the last suggestion is **"Can I speak to a live agent?"**. Typed messages such as "real person", "representative" or "talk to someone" do the same.
+
+1. The AI agent replies that it's connecting a specialist, and the left card shows **"Transferring to a live agent"** with a hold timer.
+2. The right card flips from the persona profile to the **agent assist panel**: what the human agent sees at handoff. On desktop it widens to take most of the row.
+3. The presenter clicks **Accept transfer**. The left card shows "Connected to" the category's specialist (for example "Morgan · Member Services") with their opening line, spoken aloud on a voice call.
+4. The red end button, or Escape, ends it. Switching persona or category also ends the handoff.
+
+The panel shows: the customer (name, demo ID, segment, channel), status chips (verification, intent, sentiment, reason for transfer), an AI handoff summary, suggested next steps (tickable), knowledge article titles (titles only, not real documents), a suggested opening with a Copy button, and the last lines of the actual simulated conversation. Everything is fictional and labelled "Simulated · fictional data".
+
+Each persona's panel content lives under `assist` in [`src/data.js`](src/data.js); each category's specialist is `specialist`. All of it is editable in Edit mode: choose **Edit: live-agent handoff and agent assist** from the menu.
+
 **Editing the script:** turn on **Edit text**, then choose **Edit: simulated call script** or **Edit: simulated chat script** from the menu. You can edit each category's greeting (`{name}` becomes the persona's first name), each persona's questions and answers, the "no match" reply, and the status labels. The defaults live in [`src/data.js`](src/data.js) (`greeting`, `prompts`, `answers`).
 
 ## Brand assets to request

@@ -3,7 +3,8 @@ import { useState } from 'react';
 /** Two-letter initials, ignoring a leading "Dr.". */
 export function initials(name) {
   const parts = name.replace(/^Dr\.\s+/, '').split(/\s+/).filter(Boolean);
-  return ((parts[0]?.[0] ?? '') + (parts[parts.length - 1]?.[0] ?? '')).toUpperCase();
+  if (parts.length < 2) return (parts[0]?.[0] ?? '').toUpperCase(); // single name: one letter
+  return (parts[0][0] + parts[parts.length - 1][0]).toUpperCase();
 }
 
 /**
